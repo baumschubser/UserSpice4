@@ -23,11 +23,11 @@ class DB {
 
 	private function __construct($config = []){
 		try{
-			$this->_pdo = new PDO('sqlite:userspice.sqlite') or die("cannot open database file userspice.sqlite");
-			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		} catch(PDOException $e){
-			die($e->getMessage());
-		}
+		$this->_pdo = new PDO('sqlite:'.$_SERVER['DOCUMENT_ROOT'].'/userspice.sqlite') or die("cannot open database file " . $_SERVER['DOCUMENT_ROOT'] . "/userspice.sqlite");
+		$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	} catch(PDOException $e){
+		die($e->getMessage());
+	}
 	}
 
 	public static function getInstance(){
