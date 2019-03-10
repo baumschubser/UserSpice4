@@ -17,7 +17,7 @@ if(isset($user) && $user->isLoggedIn()){
 			<h1 align="center">Welcome to <?php echo $settings->site_name;?></h1>
 			<p align="center" class="text-muted">An Open Source PHP User Management Framework. </p>
 			<p align="center">
-				<?php 
+				<?php
 				if($user->isLoggedIn()){?>
 					<a class="btn btn-primary" href="users/account.php" role="button">User Account &raquo;</a>
 				<?php }else{?>

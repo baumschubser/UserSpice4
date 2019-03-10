@@ -26,7 +26,7 @@ class Ssp {
      *
      * @return array Formatted data in a row based format
      */
-    
+
     public static function data_output ( $columns, $data, $isJoin = false )
     {
         $out = array();
@@ -108,7 +108,7 @@ class Ssp {
                 else{
                     $column_name = $column_name[0];
                 }
-                
+
 
                 if ( $requestColumn['orderable'] == 'true' ) {
                     $dir = $request['order'][$i]['dir'] === 'asc' ?
@@ -172,7 +172,7 @@ class Ssp {
             $column_name = explode(' ', $column['db']);
             //$column_name = ($column_name[2]) ? $column_name[0] : $column_name[0];
 
-            
+
             $str = $requestColumn['search']['value'];
 
             if ( $requestColumn['searchable'] == 'true' &&
@@ -224,10 +224,10 @@ class Ssp {
      *  @return array  Server-side processing response array
      *
      */
-    public static function simple ( $request, $sql_details, $table, $primaryKey, $columns, $joinQuery = NULL, $extraWhere = '', $groupBy = '', $page = '', $unionWhere = '')
+    public static function simple ( $request, $table, $primaryKey, $columns, $joinQuery = NULL, $extraWhere = '', $groupBy = '', $page = '', $unionWhere = '')
     {
         $bindings = array();
-        $db = SSP::sql_connect( $sql_details );
+        $db = SSP::sql_connect();
 
         // Build the SQL query string from the request
         $limit = SSP::limit( $request, $columns );
@@ -246,7 +246,7 @@ class Ssp {
         if($unionWhere && $joinQuery){
             $col = SSP::pluck($columns, 'db', $joinQuery);
 
-            $query =  "SELECT SQL_CALC_FOUND_ROWS ".implode(", ", $col)."
+            $query =  "SELECT ".implode(", ", $col)."
              $joinQuery
              $where
              $extraWhere
@@ -257,39 +257,40 @@ class Ssp {
              $unionWhere
              $groupBy
              $order
-             $limit
              ";
         }
         elseif($joinQuery){
-            
+
             $col = SSP::pluck($columns, 'db', $joinQuery);
 
-            $query =  "SELECT SQL_CALC_FOUND_ROWS ".implode(", ", $col)."
+            $query =  "SELECT ".implode(", ", $col)."
 			 $joinQuery
 			 $where
 			 $extraWhere
              $groupBy
              $order
-             $limit
 			 ";
 
         }else{
-            $query =  "SELECT SQL_CALC_FOUND_ROWS `".implode("`, `", SSP::pluck($columns, 'db'))."`
+            $query =  "SELECT `".implode("`, `", SSP::pluck($columns, 'db'))."`
 			 FROM `$table`
 			 $where
 			 $extraWhere
 			 $groupBy
-             $order
-			 $limit";
+          $order
+			 ";
         }
 
         $data = SSP::sql_exec( $db, $bindings,$query);
 
         // Data set length after filtering
-        $resFilterLength = SSP::sql_exec( $db,
-            "SELECT FOUND_ROWS()"
-        );
-        $recordsFiltered = $resFilterLength[0][0];
+        $recordsFiltered = count($data);
+
+        // apply limit
+        if (!empty($limit)) {
+           $limit = substr($limit, strlen("LIMIT "));
+           array_slice($input, 0, intval($limit));
+        }
 
          // Total data set length
         $count_request = "SELECT COUNT(`{$primaryKey}`)";
@@ -298,7 +299,7 @@ class Ssp {
         } else {
           $count_request .= "FROM   `$table`";
         }
-        
+
         $resTotalLength = SSP::sql_exec( $db,$count_request);
         $recordsTotal = $resTotalLength[0][0];
 
@@ -320,11 +321,11 @@ class Ssp {
 	            $all_data["data"][$i]['custom_id'] = $all_data["data"][$i][0];
 
                 $all_data["data"][$i][5] = get_custom_data1();
-                
+
                 if($all_data["data"][$i][4] == 1){
                     $all_data["data"][$i][4] = get_custom_data2(); //custom php method
                 }
-                      
+
             }
         }
 
@@ -343,16 +344,14 @@ class Ssp {
      *     * password - user password
      * @return resource Database connection handle
      */
-    public static function sql_connect ( $sql_details )
+    public static function sql_connect ()
     {
+      // return DB::getInstance();
+
         try {
-            $db = @new PDO(
-                "mysql:host={$sql_details['host']};dbname={$sql_details['db']}",
-                $sql_details['username'],
-                $sql_details['password'],
-                array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION )
-            );
-            $db->query("SET NAMES 'utf8'");
+            $db = @new PDO("sqlite:userspice.sqlite") or die("Cannot open database file userspice.sqlite");
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            //$db->query("SET NAMES 'utf8'");
         }
         catch (PDOException $e) {
             SSP::fatal(
@@ -381,7 +380,7 @@ class Ssp {
         if ( $sql === null ) {
             $sql = $bindings;
         }
-
+        error_log("Query: $sql");
         $stmt = $db->prepare( $sql );
         //echo $sql;
 

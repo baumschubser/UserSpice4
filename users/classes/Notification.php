@@ -48,7 +48,7 @@ class Notification
 
     public function archiveOldNotifications($user_id) {
         try {
-            $this->db->query('UPDATE notifications SET is_archived=1 WHERE user_id = ? AND is_read=1 AND date_created < NOW() - INTERVAL ? DAY', array($user_id, $this->archive_day_limit));
+            $this->db->query('UPDATE notifications SET is_archived=1 WHERE user_id = ? AND is_read=1 AND date_created < ' . (time() - 60*60*24*$this->archive_day_limit), array($user_id));
             return true;
         } catch (\Exception $e) {
             $this->error = $e->getMessage();

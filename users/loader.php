@@ -40,16 +40,16 @@ if ($user->isLoggedIn()) {
         $joinQuery = "FROM logs LEFT JOIN users on (users.id = logs.user_id)";
         $extraWhere = "logtype not in(select name from logs_exempt)";
         $group_by = "";
-        
+
         echo json_encode(
-                SSP::simple($_POST, $config['mysql'], $table, $primaryKey, $columns, $joinQuery, $extraWhere, $group_by));
+                SSP::simple($_POST, $table, $primaryKey, $columns, $joinQuery, $extraWhere, $group_by));
     } else {
         /*         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * If you just want to use the basic configuration for DataTables with PHP
          * server-side, there is no need to edit below this line.
          */
 
-        
+
         echo json_encode(
                 SSP::simple($_POST, $config['mysql'], $table, $primaryKey, $columns));
     }

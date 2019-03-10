@@ -33,7 +33,7 @@
 
               $missing = array_diff($migrations,$existing_updates);
               if(count($missing)) { ?>
-              <font color="red">Your database is out of date. Please <a href='<?=$us_url_root?>users/updates/' class='nounderline'>click here</a> to run the updater.</font>
+              <font color="red">Your database is out of date. Please apply the database updates from users/updates that cannot already be found in the database, table "updates", manually.</font>
             <?php } } ?>
         </div>
       </div>

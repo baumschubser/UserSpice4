@@ -57,7 +57,6 @@ class User {
 		if(isset($_SESSION['cloak_to'])){
 			$user = $_SESSION['cloak_to'];
 		}
-
 		if ($user) {
 				if($loginHandler!==null) {
 					if(!filter_var($user, FILTER_VALIDATE_EMAIL) === false){
@@ -94,8 +93,12 @@ class User {
 			Session::put($this->_sessionName, $this->data()->id);
 		} else {
 			$user = $this->find($username);
+			error_log("User: $user");
 			if ($user) {
-				if (password_verify($password,$this->data()->password)) {
+				$password_ok = password_verify($password,$this->data()->password);
+				if ($password_ok) error_log("Password ok");
+				else error_log("Password nok");
+				if ($password_ok) {
 					Session::put($this->_sessionName, $this->data()->id);
 					if ($remember) {
 						$hash = Hash::unique();
@@ -136,14 +139,18 @@ class User {
 	}
 
 	public function loginEmail($email = null, $password = null, $remember = false){
+		error_log("in loginemail mit $email und $password");
 
 		if (!$email && !$password && $this->exists()) {
 			Session::put($this->_sessionName, $this->data()->id);
 		} else {
 			$user = $this->find($email,1);
-
+			error_log("User: " . print_r($this->data(), true));
 			if ($user) {
-				if (password_verify($password,$this->data()->password)) {
+				$password_ok = password_verify($password,$this->data()->password);
+				if ($password_ok) error_log("Password ok");
+				else error_log("Password nok");
+				if ($password_ok) {
 					Session::put($this->_sessionName, $this->data()->id);
 
 					if ($remember) {

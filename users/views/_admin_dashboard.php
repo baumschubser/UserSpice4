@@ -227,9 +227,9 @@ $top = $db->query("SELECT id, logins FROM users ORDER BY logins DESC LIMIT 5")->
           ?>
         </span>
       </li>
-      <?php $dataB = $db->query("select version()")->results(true);?>
+      <?php $dataB = $db->query("select sqlite_version()")->results(true);?>
       <li class="list-group-item">
-        DB Version <span class="badge badge-primary"><?=$dataB[0]["version()"];?></span>
+        DB Version <span class="badge badge-primary"><?=$dataB[0]["sqlite_version()"];?></span>
         <span class="pull-right"></span>
       </li>
       <li class="list-group-item">
