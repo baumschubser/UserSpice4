@@ -19,8 +19,7 @@ The installation wizard is removed in this fork. But since we do not have to set
 
 1. Clone the repository or copy all files to a directory.
 * Make sure the SQLite file `userspice.sqlite` is writable for the webserver.
-* Edit the file `init.php`. In the line second to last, edit the timezone according to [this list](https://secure.php.net/manual/en/timezones.php), e.g.
-`$timezone_string = 'America/Caracas';``
+* Edit the file `init.php`. In the line second to last, edit the timezone according to [this list](https://secure.php.net/manual/en/timezones.php), e.g. `$timezone_string = 'America/Caracas';`
 
 ## Thank you
 Thank you thank you thank you to [mudmin](https://github.com/mudmin) for Userspice.
