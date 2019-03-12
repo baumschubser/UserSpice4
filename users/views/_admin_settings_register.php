@@ -29,6 +29,28 @@
         </div>
 
         <div class="form-group">
+          <label for="hideEmail">Hide email in registration form<a class="nounderline" data-toggle="tooltip" title="Hide email input and allow for registration without email address">?</a></label>
+          <span style="float:right;">
+            <label class="switch switch-text switch-success">
+              <input id="hideEmail" type="checkbox" class="switch-input toggle" data-desc="Hide Email Input" <?php if($settings->hideEmail==1) echo 'checked="true"'; ?>>
+              <span data-on="Yes" data-off="No" class="switch-label"></span>
+              <span class="switch-handle"></span>
+            </label>
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="noRealName">Hide first and last name input fields in registration form<a class="nounderline" data-toggle="tooltip" title="Hide email input and allow for registration without email address">?</a></label>
+          <span style="float:right;">
+            <label class="switch switch-text switch-success">
+              <input id="noRealName" type="checkbox" class="switch-input toggle" data-desc="Hide realname input" <?php if($settings->noRealName==1) echo 'checked="true"'; ?>>
+              <span data-on="Yes" data-off="No" class="switch-label"></span>
+              <span class="switch-handle"></span>
+            </label>
+          </span>
+        </div>
+
+        <div class="form-group">
           <label for="join_vericode_expiry">Registration Vericode Expiry (in hours) <a class="nounderline" data-toggle="tooltip" title="Length of time in hours for expiration of vericodes to email. Maximum: 999999999 (thats nine 9s!). Default: 24">?</a></label>
           <div class="input-group">
             <input type="number" step="1" min="1" max="999999999" class="form-control ajxnum" data-desc="Registration Vericode Expiry" name="join_vericode_expiry" id="join_vericode_expiry" value="<?=$settings->join_vericode_expiry?>">

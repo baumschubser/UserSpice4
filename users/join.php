@@ -49,6 +49,12 @@ $query = $db->query("SELECT * FROM email");
 $results = $query->first();
 $act = $results->email_act;
 
+// If email input is hidden for registration, email activation
+// is supressed anyways
+if ($settings->hideEmail == 1) {
+   $act=0;
+}
+
 //Opposite Day for Pre-Activation - Basically if you say in email
 //settings that you do NOT want email activation, this lists new
 //users as active in the database, otherwise they will become
@@ -59,6 +65,7 @@ if($act==1){
         $pre = 1;
 }
 
+
 $reCaptchaValid=FALSE;
 
 if(Input::exists()){
@@ -66,9 +73,13 @@ if(Input::exists()){
   if(!Token::check($token)){
     include($abs_us_root.$us_url_root.'usersc/scripts/token_error.php');
   }
-        $fname = Input::get('fname');
-        $lname = Input::get('lname');
-        $email = Input::get('email');
+        // $fname = Input::get('fname');
+        // $lname = Input::get('lname');
+        // $email = Input::get('email');
+        $fname = $settings->noRealName == 1 ? '' : 'First name';
+        $lname = $settings->noRealName == 1 ? '' : 'Last name';
+        $email = $settings->hideEmail ? '' : Input::get('email');
+
         if($settings->auto_assign_un==1) {
           $username=username_helper($fname,$lname,$email);
           if(!$username) $username=NULL;
@@ -88,81 +99,49 @@ if(Input::exists()){
         }
 
         $validation = new Validate();
-        if($settings->auto_assign_un==0) {
-        $validation->check($_POST,array(
-          'username' => array(
-                'display' => 'Username',
-                'is_not_email' => true,
-                'required' => true,
-                'min' => $settings->min_un,
-                'max' => $settings->max_un,
-                'unique' => 'users',
-          ),
-          'fname' => array(
-                'display' => 'First Name',
-                'required' => true,
-                'min' => 1,
-                'max' => 60,
-          ),
-          'lname' => array(
-                'display' => 'Last Name',
-                'required' => true,
-                'min' => 1,
-                'max' => 60,
-          ),
-          'email' => array(
-                'display' => 'Email',
-                'required' => true,
-                'valid_email' => true,
-                'unique' => 'users',
-          ),
-
-          'password' => array(
-                'display' => 'Password',
-                'required' => true,
-                'min' => $settings->min_pw,
-                'max' => $settings->max_pw,
-          ),
-          'confirm' => array(
-                'display' => 'Confirm Password',
-                'required' => true,
-                'matches' => 'password',
-          ),
-        )); }
-        if($settings->auto_assign_un==1) {
-          $validation->check($_POST,array(
-            'fname' => array(
-                  'display' => 'First Name',
-                  'required' => true,
-                  'min' => 1,
-                  'max' => 60,
-            ),
-            'lname' => array(
-                  'display' => 'Last Name',
-                  'required' => true,
-                  'min' => 1,
-                  'max' => 60,
-            ),
-            'email' => array(
-                  'display' => 'Email',
-                  'required' => true,
-                  'valid_email' => true,
-                  'unique' => 'users',
-            ),
-
-            'password' => array(
-                  'display' => 'Password',
-                  'required' => true,
-                  'min' => $settings->min_pw,
-                  'max' => $settings->max_pw,
-            ),
-            'confirm' => array(
-                  'display' => 'Confirm Password',
-                  'required' => true,
-                  'matches' => 'password',
-            ),
-          ));
-        }
+             $param_array = array(
+             'password' => array(
+                   'display' => 'Password',
+                   'required' => true,
+                   'min' => $settings->min_pw,
+                   'max' => $settings->max_pw,
+             ),
+             'confirm' => array(
+                 'display' => 'Confirm Password',
+                 'required' => true,
+                 'matches' => 'password'));
+             if($settings->auto_assign_un==0) {
+               $param_array['username'] = array(
+                   'display' => 'Username',
+                   'is_not_email' => true,
+                   'required' => true,
+                   'min' => $settings->min_un,
+                   'max' => $settings->max_un,
+                   'unique' => 'users'
+                );
+             }
+         if ($settings->noRealName != 1) {
+             $param_array['fname'] = array(
+                     'display' => 'First Name',
+                     'required' => true,
+                     'min' => 1,
+                     'max' => 60);
+             $param_array['lname'] = array(
+                     'display' => 'Last Name',
+                     'required' => true,
+                     'min' => 1,
+                     'max' => 60);
+          }
+          if ($settings->hideEmail != 1) {
+             $param_array['email'] = array(
+                      'display' => 'Email',
+                      'required' => true,
+                      'valid_email' => true,
+                      'unique' => 'users'
+                   );
+          }
+          error_log("Param Array: " . print_r($param_array, true));
+          $validation->check($_POST,$param_array);
 
         //if the agreement_checkbox is not checked, add error
         if (!$agreement_checkbox){
@@ -170,8 +149,8 @@ if(Input::exists()){
         }
 
         if($validation->passed() && $agreement_checkbox){
-                //Logic if ReCAPTCHA is turned ON
-        if($settings->recaptcha == 1 || $settings->recaptcha == 2){
+            //Logic if ReCAPTCHA is turned ON
+            if($settings->recaptcha == 1 || $settings->recaptcha == 2){
                         //require_once($abs_us_root.$us_url_root."users/includes/recaptcha.config.php");
                         //reCAPTCHA 2.0 check
                         $response = null;
@@ -227,9 +206,9 @@ if(Input::exists()){
                                 // echo "Trying to create user";
                               $theNewId = $user->create(array(
                                         'username' => $username,
-                                        'fname' => ucfirst(Input::get('fname')),
-                                        'lname' => ucfirst(Input::get('lname')),
-                                        'email' => Input::get('email'),
+                                        'fname' => $settings->noRealName == 1 ? '' : ucfirst(Input::get('fname')),
+                                        'lname' => $settings->noRealName == 1 ? '' : ucfirst(Input::get('lname')),
+                                        'email' => $settings->hideEmail  == 1 ? '' : Input::get('email'),
                                         'password' => password_hash(Input::get('password', true), PASSWORD_BCRYPT, array('cost' => 12)),
                                         'permissions' => 1,
                                         'account_owner' => 1,
@@ -238,7 +217,7 @@ if(Input::exists()){
                                         'active' => 1,
                                         'vericode' => $vericode,
                                         'vericode_expiry' => $vericode_expiry,
-                                        'oauth_tos_accepted' => true
+                                        'oauth_tos_accepted' => true,
                                 ));
 
                         } catch (Exception $e) {
@@ -253,8 +232,8 @@ if(Input::exists()){
                         if($act==0) logger($theNewId,"User","Registration completed.");
                         Redirect::to($us_url_root.'users/joinThankYou.php');
                 }
-
         } //Validation and agreement checbox
+        else error_log("Validation failed");
 } //Input exists
 
 ?>

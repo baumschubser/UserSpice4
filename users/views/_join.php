@@ -38,17 +38,18 @@ Special thanks to John Bovey for the password strenth feature.
         <?php if($settings->auto_assign_un==0) {?><label>Username*</label>&nbsp;&nbsp;<span id="usernameCheck" class="small"></span>
         <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="<?php if (!$form_valid && !empty($_POST)){ echo $username;} ?>" required autofocus autocomplete="username"><?php } ?>
 
+        <?php if ($settings->noRealName != 1) : ?>
+           <label for="fname">First Name*</label>
+           <input type="text" class="form-control" id="fname" name="fname" placeholder="First Name" value="<?php if (!$form_valid && !empty($_POST)){ echo $fname;} ?>" required autofocus autocomplete="given-name">
 
-        <label for="fname">First Name*</label>
-        <input type="text" class="form-control" id="fname" name="fname" placeholder="First Name" value="<?php if (!$form_valid && !empty($_POST)){ echo $fname;} ?>" required autofocus autocomplete="given-name">
-
-        <label for="lname">Last Name*</label>
-        <input type="text" class="form-control" id="lname" name="lname" placeholder="Last Name" value="<?php if (!$form_valid && !empty($_POST)){ echo $lname;} ?>" required autocomplete="family-name">
-
-        <label for="email">Email Address*</label>
-        <input  class="form-control" type="text" name="email" id="email" placeholder="Email Address" value="<?php if (!$form_valid && !empty($_POST)){ echo $email;} ?>" required autocomplete="email">
-
+           <label for="lname">Last Name*</label>
+           <input type="text" class="form-control" id="lname" name="lname" placeholder="Last Name" value="<?php if (!$form_valid && !empty($_POST)){ echo $lname;} ?>" required autocomplete="family-name">
+        <?php endif;
+        if ($settings->hideEmail != 1) : ?>
+           <label for="email">Email Address*</label>
+           <input  class="form-control" type="text" name="email" id="email" placeholder="Email Address" value="<?php if (!$form_valid && !empty($_POST)){ echo $email;} ?>" required autocomplete="email">
         <?php
+         endif;
 
         $character_range = 'Be between '.$settings->min_pw . ' and ' . $settings->max_pw;
         $character_statement = '<span id="character_range" class="gray_out_text">' . $character_range . ' characters</span>';

@@ -5,6 +5,11 @@
 
  **This a fork from [UserSpice 4.4](https://github.com/mudmin/UserSpice4/) that uses a SQLite file instead of MySQL as database.**
 
+ ### Added features
+
+ * Ability to register without Email (hide Email input in registration form) - configurable in Dashboard->Registration
+ * Ability to register without real name (hide names input in registration form) - configurable in Dashboard->Registration
+
 ### Requirements
 
 Make sure you have all requirements installed:
@@ -18,8 +23,8 @@ Make sure you have all requirements installed:
 The installation wizard is removed in this fork. But since we do not have to setup a MySQL database connection, all is left to do is setting the timezone.
 
 1. Clone the repository or copy all files to a directory.
-* Make sure the SQLite file `userspice.sqlite` is writable for the webserver.
-* Edit the file `init.php`. In the line second to last, edit the timezone according to [this list](https://secure.php.net/manual/en/timezones.php), e.g. `$timezone_string = 'America/Caracas';`
+2. Make sure the SQLite file `userspice.sqlite` is writable for the webserver.
+3. Edit the file `init.php`. In the line second to last, edit the timezone according to [this list](https://secure.php.net/manual/en/timezones.php), e.g. `$timezone_string = 'America/Caracas';`
 
 ## Thank you
 Thank you thank you thank you to [mudmin](https://github.com/mudmin) for Userspice.
