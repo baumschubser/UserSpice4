@@ -62,8 +62,12 @@ class DB {
 						$this->_results = $this->_query->fetchALL(PDO::FETCH_OBJ);
 						$this->_resultsArray = json_decode(json_encode($this->_results),true);
 					}
-					// $this->_count = $this->_query->rowCount();
-					$this->_count = count($this->_resultsArray);
+					// For delete, fetchAll returns nothing and rowCount returns deleted rows
+					if (substr(strtoupper($sql), 0, strlen('DELETE')) === 'DELETE') {
+						$this->_count = $this->_query->rowCount();
+					} else {
+						$this->_count = count($this->_resultsArray);
+					}
 					$this->_lastId = $this->_pdo->lastInsertId();
 				} else{
 					$this->_error = true;
