@@ -471,23 +471,22 @@ function formField($o, $v = []){
               $check = checkFormName($name,$opts);
               if($check['success']==true){
                 // echo 'Good to go';
-                $columns = "id INT( 11 ) AUTO_INCREMENT PRIMARY KEY";
-                $columns2 = "`id` INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
-                `ord` int(11) NOT NULL,
-                `col` varchar(255) NOT NULL,
-                `form_descrip` varchar(255) NOT NULL,
-                `table_descrip` varchar(255) NOT NULL,
-                `col_type` varchar(255) NOT NULL,
-                `field_type` varchar(100) NOT NULL,
-                `length` int(11) NOT NULL,
-                `required` tinyint(1) NOT NULL,
-                `validation` text NOT NULL,
-                `label_class` varchar(255) NOT NULL,
-                `field_class` varchar(255) NOT NULL,
-                `input_html` text NOT NULL,
-                `select_opts` text NOT NULL";
-                $db->query("CREATE TABLE IF NOT EXISTS $name ( $columns )");
-                $db->query("CREATE TABLE IF NOT EXISTS $form ( $columns2 )");
+                $columns = "`id` INTEGER PRIMARY KEY AUTOINCREMENT";
+                $columns2 = "`id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                `ord` INTEGER NOT NULL,
+                `col` TEXT NOT NULL,
+                `form_descrip` TEXT NOT NULL,
+                `table_descrip` TEXT NOT NULL,
+                `col_type` text,
+                `field_type` TEXT NOT NULL,
+                `required` INTEGER,
+                `validation` TEXT,
+                `label_class` TEXT,
+                `field_class` TEXT,
+                `input_html` TEXT,
+                `select_opts` TEXT";
+                $db->query("CREATE TABLE IF NOT EXISTS `$name` ( $columns )");
+                $db->query("CREATE TABLE IF NOT EXISTS `$form` ( $columns2 )");
                 $db->insert('us_forms',['form'=>$name]);
                 $id = $db->lastId();
                 Redirect::to($us_url_root.'users/admin.php?view=forms_edit&edit='.$id.'&err=Form+created!');
@@ -496,8 +495,6 @@ function formField($o, $v = []){
                 exit;
               }
             }
-
-
 
             function buildFormFromTable($name){
               $db = DB::getInstance();
@@ -516,19 +513,19 @@ function formField($o, $v = []){
                   if($count < 1){
                     $db->insert('us_forms',['form'=>$name]);
                     $id = $db->lastId();
-                    $columns2 = "`id` INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
-                    `ord` int(11) NOT NULL,
-                    `col` varchar(255) NOT NULL,
-                    `form_descrip` varchar(255) NOT NULL,
-                    `table_descrip` varchar(255) NOT NULL,
-                    `col_type` varchar(255) NOT NULL,
-                    `field_type` varchar(100) NOT NULL,
-                    `required` tinyint(1) NOT NULL,
-                    `validation` text NOT NULL,
-                    `label_class` varchar(255) NOT NULL,
-                    `field_class` varchar(255) NOT NULL,
-                    `input_html` text NOT NULL,
-                    `select_opts` text NOT NULL";
+                    $columns2 = "`id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                    `ord` INTEGER NOT NULL,
+                    `col` TEXT NOT NULL,
+                    `form_descrip` TEXT NOT NULL,
+                    `table_descrip` TEXT NOT NULL,
+                    `col_type` text,
+                    `field_type` TEXT NOT NULL,
+                    `required` INTEGER,
+                    `validation` TEXT,
+                    `label_class` TEXT,
+                    `field_class` TEXT,
+                    `input_html` TEXT,
+                    `select_opts` TEXT";
                     $db->query("CREATE TABLE IF NOT EXISTS $form ( $columns2 )");
                     $schema = $db->query("SHOW COLUMNS FROM $name")->results(true);
                     foreach($schema as $s){
@@ -686,7 +683,7 @@ function formField($o, $v = []){
             function getValidTables(){
               //get a list of tables that don't end in _form
               $db = DB::getInstance();
-              $query = $db->query("SHOW TABLES")->results();
+              $query = $db->query("SELECT name FROM sqlite_master WHERE type='table'")->results();
               $tables = [];
               foreach($query as $t){
                 foreach($t as $q){
@@ -727,18 +724,16 @@ function formField($o, $v = []){
               //if you are building a form from an existing db table, you want to skip this
               //check because you NEED an existing table here.
               if(!in_array('existing',$opts)){
-                $test = $db->query("SELECT * FROM $name")->first();
-                $e = $db->errorString();
-                if (strpos($e, $error) !== false){
+                $test = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='$name'");
+                if ($test->count() != 0){
                   $msg['msg'] = "Sorry! A table with that name exists in your database!";
                   return $msg;
                   exit;
                 }
               }//end existing skip
               $name = $name."_form";
-              $test = $db->query("SELECT * FROM $name")->first();
-              $e = $db->errorString();
-              if (strpos($e, $error) !== false){
+              $test = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='$name'");
+              if ($test->count() != 0){
                 $msg['msg'] = "Sorry! It looks like you used to have a form by that name that was never fully deleted!";
                 return $msg;
                 exit;
