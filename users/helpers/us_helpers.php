@@ -1459,8 +1459,8 @@ if(!function_exists('killSessions')) {
 		$i=0;
 		foreach($sessions as $session) {
 			if(is_numeric($session)) {
-				if(!$admin) $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=NOW() WHERE kUserSessionID = ? AND fkUserId = ?",[$session,$user->data()->id]);
-				else $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=NOW() WHERE kUserSessionID = ?",[$session]);
+				if(!$admin) $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=datetime('now','localtime') WHERE kUserSessionID = ? AND fkUserId = ?",[$session,$user->data()->id]);
+				else $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=datetime('now','localtime') WHERE kUserSessionID = ?",[$session]);
 				if(!$db->error()) {
 					$i++;
 					logger($user->data()->id,"User Tracker","Killed Session ID#$session");
@@ -1479,8 +1479,8 @@ if(!function_exists('passwordResetKillSessions')) {
 	function passwordResetKillSessions($uid=NULL) {
 		global $user;
 		$db = DB::getInstance();
-		if(is_null($uid)) $q = $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=NOW() WHERE fkUserID = ? AND UserSessionEnded=0 AND kUserSessionID <> ?",[$user->data()->id,$_SESSION['kUserSessionID']]);
-		else $q = $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=NOW() WHERE fkUserID = ? AND UserSessionEnded=0",[$uid]);
+		if(is_null($uid)) $q = $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=datetime('now','localtime') WHERE fkUserID = ? AND UserSessionEnded=0 AND kUserSessionID <> ?",[$user->data()->id,$_SESSION['kUserSessionID']]);
+		else $q = $db->query("UPDATE us_user_sessions SET UserSessionEnded=1,UserSessionEnded_Time=datetime('now','localtime') WHERE fkUserID = ? AND UserSessionEnded=0",[$uid]);
 		if(!$db->error()) {
 			$count=$db->count();
 			if(is_null($uid)) {
